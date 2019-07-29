@@ -29,5 +29,7 @@ for index,line in fin.iterrows():
 fout.close()
 
 
+## create male/female partition. 
+## create partition by region ? 
 
 
