@@ -12,15 +12,7 @@ import pandas as pd
 from tqdm import tqdm
 
 main_dir = '/u/scratch/d/datduong/SemEval2017Task4/'
-out_dir = '/u/scratch/d/datduong/SemEval2017Task4/SemEval2017Task4Code/BERT/Data/TextData/'
-
-user_map = {} ## map user {1:someID}
-df = pd.read_csv(main_dir+'SemEval2017-task4-dev.subtask-BD.english.INPUT.txt',header=None,sep="\t")
-user = list(df[0])
-userid = list (df[1])
-for i in range(len(user)):
-  user_map[user[i]]=userid[i]
-
+out_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 
 vocab = {} ## also count, do this for ALL test/train/dev ?
 
@@ -30,10 +22,10 @@ vocab = {} ## also count, do this for ALL test/train/dev ?
 ## format is 
 ## 681563394940473347      amy schumer     negative        @MargaretsBelly Amy Schumer is the stereotypical 1st world Laci Green feminazi. Plus she's unfunny
 
-df = pd.read_csv(main_dir+data_type+'.txt',header=None,sep="\t")
+df = pd.read_csv(main_dir+'SemEval2017-task4-dev.subtask-BD.english.INPUT.txt',header=None,sep="\t")
 df.columns = ['tweet_id', 'topic', 'sentiment_score', 'tweet_text']
 
-bert_pretrain_file = open(out_dir+data_type+"_bert_pretrain_file.txt","w")
+bert_pretrain_file = open(out_dir+"task4B_bert_pretrain_file.txt","w")
 
 for index,row in tqdm ( df.iterrows() ) :
 
