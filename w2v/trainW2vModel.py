@@ -46,7 +46,7 @@ def submitJobs (path2TextFiles , file2savePath, file_wanted, modelName2save, dim
 
   print ('now running model\n')
   ## using min_count = 0 to keep all the words appearing in tweet. didn't seem to be that many words
-  model = gensim.models.Word2Vec(sentences,min_count=0,size=dimensionOfVec,max_vocab_size=150000,workers=4,window=5)
+  model = gensim.models.Word2Vec(sentences,min_count=2,size=dimensionOfVec,max_vocab_size=150000,workers=4,window=5,iter=100)
   
   print ('finished running, now save file\n')
   model.save(os.path.join(file2savePath,modelName2save))

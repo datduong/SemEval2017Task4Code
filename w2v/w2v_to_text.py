@@ -22,6 +22,9 @@ vocab = []
 
 fin = open ( "W2vEmbTweetall.txt",'r', encoding='utf-8' )
 
+# keep1 = None
+# keep2 = None
+
 counter = -1
 for line in fin: 
   if counter == -1:
@@ -33,6 +36,12 @@ for line in fin:
   word = "_".join(word) ## make life easier if we don't have space for given word
   vocab.append(word)
   np_format [counter] = [float(x) for x in line[(len(line)-dim):len(line)]]
+  #
+  # if word == 'he': 
+  #   keep1 = np_format [counter]
+  # if word == 'she': 
+  #   keep2 = np_format [counter]
+  #
   counter = 1 + counter 
 
 

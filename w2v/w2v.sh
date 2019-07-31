@@ -17,5 +17,5 @@ mkdir $out_dir
 # . /u/local/Modules/default/init/modules.sh
 # module load python/3.7.2
 
-/u/home/d/datduong/anaconda2/bin/python trainW2vModel.py $data_dir $out_dir $file_wanted W2vEmbTweet$choice 100 > $choice.log
+/u/home/d/datduong/anaconda2/bin/python trainW2vModel.py $data_dir $out_dir $file_wanted W2vEmbTweet$choice 300 > $choice.log
 
