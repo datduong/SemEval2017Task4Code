@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-CHOICE = 'all'
+CHOICE = 'FEMALE'
 main_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 out_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 
@@ -40,10 +40,19 @@ for index,line in fin.iterrows():
     counter = 1.0 * len ([k for k in gender if CHOICE in k]) ## how many times word like 'male' appear 
     if counter > 0: # / len(gender) >=.33: 
       line_out = word_tokenize( line['text'].lower() ) ## use lower case because too many low freq. words ? 
-      fout.write( " ".join(line_out) +"\n" ) 
+      ## format topic name so that we encoder whole entity ? 
+      line_out = " ".join(line_out) +"\n" 
+      topic = re.sub(" ","_",line['topic'].lower())
+      line_out = re.sub( line['topic'], topic, line_out )
+      fout.write( line_out.strip() +"\n" ) 
   else: 
     line_out = word_tokenize( line['text'].lower() ) ## use lower case because too many low freq. words ? 
-    fout.write( " ".join(line_out) +"\n" ) 
+    ## format topic name so that we encoder whole entity ? 
+    line_out = " ".join(line_out) +"\n" 
+    topic = re.sub(" ","_",line['topic'].lower())
+    line_out = re.sub( line['topic'], topic, line_out )
+    fout.write( line_out.strip() +"\n" ) 
+
 
 
 fout.close()
