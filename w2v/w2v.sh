@@ -33,11 +33,6 @@ for choice in male FEMALE ; do
   out_dir=$data_dir/$fout_name
   mkdir $out_dir
 
-  ## train w2v on tweets
-
-  # . /u/local/Modules/default/init/modules.sh
-  # module load python/3.7.2
-
   /u/home/d/datduong/anaconda2/bin/python trainW2vModel.py $data_dir $out_dir $file_wanted $fout_name $dim > $choice.log
 
   python3 w2v_to_text.py $fout_name $dim
