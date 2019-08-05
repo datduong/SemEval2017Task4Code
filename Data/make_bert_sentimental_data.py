@@ -36,12 +36,15 @@ for index,row in tqdm ( df.iterrows() ) :
     label = "not_entailment" ## avoid changing BERT code if we do this
 
   user_text = " ".join( row[s] for s in ['description','name','location'] if row[s] is not np.NaN)
-  user_text = user_text.strip()
+  user_text = user_text.strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
+
+  row_text = row['text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
+
   if len(user_text) > 0 : ## has something
-    text_sent = user_text + "\t" + row['topic'] + " " + row['text'] + "\t" + label
+    text_sent = user_text + "\t" + row['topic'] + " " + row_text + "\t" + label
 
   else:
-    text_sent = row['topic'] + "\t" + row['text'] + "\t" + label ## ignore user name
+    text_sent = row['topic'] + "\t" + row_text + "\t" + label ## ignore user name
 
   bert_pretrain_file.write( str(counter) + "\t" + text_sent + "\n") ## blank between document
   counter = counter + 1
@@ -61,7 +64,9 @@ for index,row in tqdm ( df.iterrows() ) :
   if row['sentiment_score'] == 'negative':
     label = "not_entailment" ## avoid changing BERT code if we do this
 
-  text_sent = row['topic'] + "\t" + row['tweet_text'] + "\t" + label ## ignore user name
+  row_text = row['tweet_text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
+
+  text_sent = row['topic'] + "\t" + row_text + "\t" + label ## ignore user name
 
   bert_pretrain_file.write( str(counter) + "\t" + text_sent + "\n") ## blank between document
   counter = counter + 1
