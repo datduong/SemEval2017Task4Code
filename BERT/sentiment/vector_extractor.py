@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import glob
 import logging
-import os
+import os, sys, re, pickle
 import random
 
 import numpy as np
@@ -25,7 +25,7 @@ from pytorch_transformers import (WEIGHTS_NAME, BertConfig,
 
 from pytorch_transformers import AdamW, WarmupLinearSchedule
 
-sys.path.append("/local/datdb/pytorch_transformers/examples")
+sys.path.append("/local/datdb/pytorch-transformers/examples")
 import utils_glue as utils_glue
 
 

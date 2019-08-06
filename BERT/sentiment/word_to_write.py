@@ -57,5 +57,5 @@ df.shape
 df = df.drop_duplicates()
 df.shape
 
-df.to_csv('word_to_get_vec.txt',index=None)
+df.to_csv('word_to_get_vec.txt',index=None,sep="\t",columns=None,header=None)
 

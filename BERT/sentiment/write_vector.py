@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import glob
 import logging
-import os
+import os, sys, pickle
 import random
 import re
 
@@ -27,6 +27,8 @@ from pytorch_transformers import (WEIGHTS_NAME, BertConfig,
 
 from pytorch_transformers import AdamW, WarmupLinearSchedule
 
+sys.path.append("/local/datdb/pytorch-transformers/examples")
+
 from utils_glue import (compute_metrics, convert_examples_to_features,
                         output_modes, processors)
 
@@ -39,13 +41,13 @@ MODEL_CLASSES = {
 }
 
 
+sys.path.append("/local/datdb/SemEval2017Task4/SemEval2017Task4Code/")
 import BERT.sentiment.vector_extractor as vector_extractor
 import BERT.sentiment.arg_input as arg_input
 args = arg_input.get_args()
 
 
 ## extract some layer in bert to represent the user/keyword vectors
-
 
 
 ## follow the same technique https://github.com/huggingface/pytorch-transformers/blob/master/examples/run_glue.py
