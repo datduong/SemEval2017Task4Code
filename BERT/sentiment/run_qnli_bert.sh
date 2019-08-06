@@ -50,4 +50,6 @@ word_vector_output=$output_dir/'word_vector.txt'
 CUDA_VISIBLE_DEVICES=4 python3 -u BERT/sentiment/write_vector.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --max_seq_length 512 --overwrite_output_dir --word_vector_input $word_vector_input --word_vector_output $word_vector_output > $output_dir/track.log
 
 
+## convert into form for @hist_words 
+
 

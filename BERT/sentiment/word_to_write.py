@@ -53,9 +53,13 @@ for t in topic :
 fout.close()
 
 df = pd.read_csv('word_to_get_vec.txt',header=None,sep="\t")
-df.shape
+print (df.shape)
 df = df.drop_duplicates()
-df.shape
+print (df.shape)
+
+## remove empty 
+df = df.dropna()
+print (df.shape)
 
 df.to_csv('word_to_get_vec.txt',index=None,sep="\t",columns=None,header=None)
 

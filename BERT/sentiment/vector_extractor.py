@@ -32,14 +32,15 @@ import utils_glue as utils_glue
 logger = logging.getLogger(__name__)
 
 
-## extract vectors from bert model 
+## extract vectors from bert model
 
 class Extractor2ndLast (nn.Module):
-  def __init__(self,bert_model,**kwargs):
+  def __init__(self,bert_model,args,**kwargs):
 
     super().__init__()
+    self.args = args
     self.bert_model = bert_model
-    self.bert_model.bert.encoder.output_hidden_states = True ## turn on this option to see the layers. 
+    self.bert_model.bert.encoder.output_hidden_states = True ## turn on this option to see the layers.
 
   def encode_label_desc (self, label_desc, label_len, label_mask): # @label_desc is matrix row=sentence, col=index
 
@@ -57,8 +58,8 @@ class Extractor2ndLast (nn.Module):
     # the entire model is fine-tuned.
     # https://github.com/huggingface/pytorch-pretrained-BERT/blob/master/examples/extract_features.py#L95
 
-    encoded_layer , _  = self.bert_model.bert (input_ids=label_desc, token_type_ids=None, attention_mask=label_mask)
-    second_tolast = encoded_layer[3][-2] ## @encoded_layer is tuple in the format: sequence_output, pooled_output, (hidden_states), (attentions)
+    encoded_layer = self.bert_model.bert (input_ids=label_desc, token_type_ids=None, attention_mask=label_mask)
+    second_tolast = encoded_layer[2][-2] ## @encoded_layer is tuple in the format: sequence_output, pooled_output, (hidden_states), (attentions)
     second_tolast[label_mask == 0] = 0 ## mask to 0, so that summation over len will not be affected with strange numbers
     cuda_second_layer = (second_tolast).type(torch.FloatTensor).cuda()
     encode_sum = torch.sum(cuda_second_layer, dim = 1).cuda()
@@ -78,18 +79,16 @@ class Extractor2ndLast (nn.Module):
 
     counter = 0 ## count the label to be written
     for step, batch in enumerate(tqdm(label_desc_loader, desc="get label vec")):
-      if self.args.use_cuda:
-        batch = tuple(t.cuda() for t in batch)
-      else:
-        batch = tuple(t for t in batch)
 
-      label_desc1, label_len1, label_mask1 = batch
+      batch = tuple(t.cuda() for t in batch)
+
+      label_desc1, label_mask1, label_len1, _ = batch ### input_id, mask, len
 
       with torch.no_grad():
         label_desc1.data = label_desc1.data[ : , 0:int(max(label_len1)) ] # trim down input to max len of the batch
         label_mask1.data = label_mask1.data[ : , 0:int(max(label_len1)) ] # trim down input to max len of the batch
         label_emb1 = self.encode_label_desc(label_desc1,label_len1,label_mask1)
-       
+
       label_emb1 = label_emb1.detach().cpu().numpy()
 
       if fout_name is not None:
@@ -109,6 +108,29 @@ class Extractor2ndLast (nn.Module):
 
 
 
+class InputExample(object):
+  """A single training/test example for simple sequence classification."""
+
+  def __init__(self, guid, text_a, text_b=None, label=None, name=None):
+    """Constructs a InputExample.
+
+    Args:
+      guid: Unique id for the example.
+      text_a: string. The untokenized text of the first sequence. For single
+      sequence tasks, only this sequence must be specified.
+      text_b: (Optional) string. The untokenized text of the second sequence.
+      Only must be specified for sequence pair tasks.
+      label: (Optional) string. The label of the example. This should be
+      specified for train and dev examples, but not for test examples.
+    """
+    self.guid = guid
+    self.text_a = text_a
+    self.text_b = text_b
+    self.label = label
+    self.name = name
+
+
+
 class LabelDescProcessor(utils_glue.DataProcessor):
 
   def get_train_examples(self, data_dir, file_name):
@@ -119,7 +141,7 @@ class LabelDescProcessor(utils_glue.DataProcessor):
   def get_dev_examples(self, data_dir):
     """See base class."""
     return self._create_examples(
-      self._read_tsv(os.path.join(data_dir, "dev.tsv")), 
+      self._read_tsv(os.path.join(data_dir, "dev.tsv")),
       "dev_matched")
 
   def get_labels(self):
@@ -130,13 +152,28 @@ class LabelDescProcessor(utils_glue.DataProcessor):
     """Creates examples for the training and dev sets."""
     examples = []
     for (i, line) in enumerate(lines):
-      if i == 0:
-        continue
+      # if i == 0: ## no header
+      #   continue
       guid = "%s-%s" % (set_type, line[0])
       text_a = line[1]
       examples.append(
-        utils_glue.InputExample(guid=guid, text_a=text_a, label=1)) ## just put @label=1, so we can reuse code 
+        InputExample(guid=guid, text_a=text_a, label=1, name=line[0])) ## just put @label=1, so we can reuse code
     return examples
+
+
+
+
+class InputFeatures(object):
+  """A single set of features of data."""
+
+  def __init__(self, input_ids, input_mask, input_len, segment_ids, label_id, name=None):
+    self.input_ids = input_ids
+    self.input_mask = input_mask
+    self.input_len = input_len
+    self.segment_ids = segment_ids
+    self.label_id = label_id
+    self.name = name
+
 
 
 
@@ -199,7 +236,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
 
     ## !!!  DO NOT ADD [CLS] AND [SEP]
 
-    tokens = tokens_a 
+    tokens = tokens_a
     segment_ids = [sequence_a_segment_id] * len(tokens)
 
     if tokens_b:
@@ -207,6 +244,9 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
       segment_ids += [sequence_b_segment_id] * (len(tokens_b) + 1)
 
     input_ids = tokenizer.convert_tokens_to_ids(tokens)
+    
+    ## true len
+    input_len = len(input_ids)
 
     # The mask has 1 for real tokens and 0 for padding tokens. Only real
     # tokens are attended to.
@@ -229,34 +269,39 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
 
 
     if ex_index < 5:
-      logger.info("*** Example ***")
-      logger.info("guid: %s" % (example.guid))
-      logger.info("tokens: %s" % " ".join(
+      print("*** Example ***")
+      print("guid: %s" % (example.guid))
+      print("tokens: %s" % " ".join(
           [str(x) for x in tokens]))
-      logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-      logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
-      logger.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
+      print("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+      print("input_mask: %s" % " ".join([str(x) for x in input_mask]))
+      print("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
 
     features.append(
-        utils_glue.InputFeatures(input_ids=input_ids,
+        InputFeatures(input_ids=input_ids,
                 input_mask=input_mask,
+                input_len =input_len,
                 segment_ids=segment_ids,
-                label_id=1))
+                label_id=1,
+                name = example.name ))
   return features
 
 
-def make_loader (args,file_name,tokenizer,batch_size): 
+def make_loader (args,file_name,tokenizer,batch_size):
   processor = LabelDescProcessor()
-  examples = processor.get_train_examples(args.data_dir,file_name) 
+  examples = processor.get_train_examples(args.data_dir,file_name)
   features = convert_examples_to_features(examples, None, 512, tokenizer,output_mode=None)
+
+  all_name = [f.name for f in features] ## retain exact ordering as they appear
 
   all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
   all_input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long)
+  all_input_len = torch.tensor([f.input_len for f in features], dtype=torch.float)
   all_segment_ids = torch.tensor([f.segment_ids for f in features], dtype=torch.long)
 
-  dataset = TensorDataset(all_input_ids, all_input_mask, all_segment_ids)
-  
+  dataset = TensorDataset(all_input_ids, all_input_mask, all_input_len, all_segment_ids)
+
   sampler = SequentialSampler(dataset)
-  return DataLoader(dataset, sampler=sampler, batch_size=batch_size)
+  return DataLoader(dataset, sampler=sampler, batch_size=batch_size), all_name
 
 

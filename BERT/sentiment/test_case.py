@@ -37,7 +37,9 @@ model = BertForSequenceClassification(config)
 input_ids = torch.tensor(tokenizer.encode("Hello, my dog is cute")).unsqueeze(0)  # Batch size 1
 input_ids = torch.cat((input_ids,input_ids),0)
 
-model.bert(input_ids)
+model.bert.encoder.output_hidden_states = True
+
+outputs = model.bert(input_ids)
 
 
 embedding_output = model.bert.embeddings(input_ids)

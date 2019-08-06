@@ -59,21 +59,41 @@ tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenize
 
 model = model_class.from_pretrained(args.model_name_or_path, from_tf=bool('.ckpt' in args.model_name_or_path), config=config)
 
-ModelWriter = vector_extractor.Extractor2ndLast(model) ## probably not the smartest way ...
+ModelWriter = vector_extractor.Extractor2ndLast(model,args) ## probably not the smartest way ...
 ModelWriter.cuda()
 
 
 ## !!!! load label data ... label is one word like "feminist"
-label_desc_loader = vector_extractor.make_loader (args,args.word_vector_input,tokenizer,64)
+label_desc_loader, all_name = vector_extractor.make_loader (args,args.word_vector_input,tokenizer,64)
 
-label_name = pd.read_csv(args.word_vector_input,header=None)
-label_name = list ( label_name[0] )
-label_name = [ re.sub(" ","_",lab) for lab in label_name ] ## because gensim uses space delim
+df = pd.read_csv(args.word_vector_input,header=None,sep="\t",dtype='str')
+label_name = list ( df[0] )
+sensible_word = []
+for index,lab in enumerate(label_name): 
+    try : 
+        sensible_word.append ( re.sub(" ","_",lab) ) 
+    except: 
+        print (index)
+        print (lab)
+        pass 
+
+print ('num word in data {}'.format(len(label_name)))
+print ('num word that regex can recognize {}'.format(len(sensible_word)))
+
+print ('dim df before/after')
+print (df.shape)
+df = df[df[0].isin(sensible_word)] ## ignore weird symbols
+print (df.shape)
+
+label_name = list ( df[0] )
 
 print ('see some input words to get vector for ...')
 print (label_name[0:10])
 
-label_emb = ModelWriter.write_vector (label_desc_loader,args.word_vector_output,label_name)
+print ('see built in')
+print (all_name[0:10])
+
+label_emb = ModelWriter.write_vector (label_desc_loader,args.word_vector_output,all_name)
 
 
 
