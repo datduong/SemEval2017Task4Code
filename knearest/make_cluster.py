@@ -124,7 +124,7 @@ print (np.quantile(user_num, np.arange(0.1,1,.1)))
 from scipy import stats
 stats.describe(user_num)
 
-for group_num in [0]:
+for group_num in [6,7]:
   user_group_to_get = extract_user_in_group(user_name, clusters,group_num)
   user_group_to_get = [ re.sub("userId","",u) for u in user_group_to_get] ## get row number
   fin2 = fin[fin['user_id'].isin(user_group_to_get)]
