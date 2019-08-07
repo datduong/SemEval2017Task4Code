@@ -34,6 +34,12 @@ CUDA_VISIBLE_DEVICES=4 python3 -u run_glue.py --data_dir $data_dir --model_type 
 
 ## *** GET WORD VECTORS
 
+## create filles with words to extract vectors from 
+cd $SCRATCH/SemEval2017Task4/SemEval2017Task4Code/  
+python3 BERT/sentiment/word_to_write.py 
+
+
+##
 conda activate tensorflow_gpuenv
 cd /local/datdb/SemEval2017Task4/SemEval2017Task4Code/  # BERT/sentiment
 
@@ -51,5 +57,5 @@ CUDA_VISIBLE_DEVICES=4 python3 -u BERT/sentiment/write_vector.py --data_dir $dat
 
 
 ## convert into form for @hist_words 
-
+python3 BERT/sentiment/convert_to_np.py
 

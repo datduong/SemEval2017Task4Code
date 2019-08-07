@@ -33,14 +33,21 @@ fin.close()
 
 ## load user description and topics
 
-user_desc = pd.read_csv ('output_semeval_userinfo.gender.tsv', sep="\t",dtype='str')
+user_desc = pd.read_csv ('output_semeval_tweet_userinfo.gender.tsv', sep="\t",dtype='str')
 
+counter = 0
 for index,line in user_desc.iterrows():
-  line_out =" ".join( line[s] for s in ['description','name','location'] if line[s] is not np.NaN)
+  ## must add "tweet_text" otherwise user description alone doesn't make sense ?? 
+  line_out =" ".join( line[s] for s in ['description','name','location'] if line[s] is not np.NaN) + " " + line['text']
   line_out = line_out.strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
   if len(line_out) == 0:
     continue
-  fout.write( 'user'+str(index) + "\t" + line_out +"\n" )
+  fout.write( 'userId'+str(line['user_id']) + "\t" + line_out +"\n" )
+  counter = counter + 1 
+
+
+print ('data dim {}'.format(user_desc.shape))
+print ('user with no empty string {}'.format(user_desc.shape))
 
 
 ## topics

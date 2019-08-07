@@ -6,7 +6,7 @@ from sklearn import preprocessing
 
 
 
-num_vocab = 52131 # 52131 768
+num_vocab = 52125 # 52131 768
 dim = 768
 
 np_format = np.zeros((num_vocab,dim))
