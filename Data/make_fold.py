@@ -5,7 +5,11 @@ import os,sys,re,pickle,gzip
 import numpy as np 
 from tqdm import tqdm 
 
-main_dir = '/local/datdb/SemEval2017Task4/4B-English/'
+server = '/u/scratch/d/datduong/'
+# main_dir = '/local/datdb/SemEval2017Task4/4B-English/'
+
+
+main_dir = server+'SemEval2017Task4/4B-English/'
 os.chdir(main_dir)
 
 
@@ -26,10 +30,8 @@ def train_validate_test_split(df, train_percent=.85, validate_percent=.05, seed=
 
 
 
-df = pd.read_csv("/local/datdb/SemEval2017Task4/4B-English/task4B_bert_sentiment_file_notweet.txt",sep="\t")
-
+df = pd.read_csv(server+"SemEval2017Task4/4B-English/task4B_bert_sentiment_file_notweet.txt",sep="\t")
 main_dir = main_dir + '/' + 'BertSentiment' 
-
 if not os.path.exists(main_dir): 
   os.mkdir(main_dir)
 
@@ -43,3 +45,5 @@ for fold in [1]:
   train.to_csv('train.tsv',index=None,sep="\t")
   validate.to_csv('dev.tsv',index=None,sep="\t")
   test.to_csv('test.tsv',index=None,sep="\t")
+
+

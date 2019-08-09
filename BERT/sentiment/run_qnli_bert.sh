@@ -1,11 +1,15 @@
 
+## can we load a model with more than 2 id types ??? 
+
+
+
 ## run entailment based on BERT. using QNLI as template input 
 
 conda activate tensorflow_gpuenv
 cd /local/datdb/pytorch-transformers/examples
 
 data_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentiment/notweet_fold_1/'
-output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentiment/notweet_fold_1/'
+output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentiment/notweet_fold_1_try6segmentId/'
 model_name_or_path='/local/datdb/SemEval2017Task4/4B-English/BertFineTune/'
 config_name=$model_name_or_path/'bert_config.json'
 tokenizer_name='bert-base-cased'
