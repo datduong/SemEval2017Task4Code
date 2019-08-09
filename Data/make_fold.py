@@ -26,7 +26,7 @@ def train_validate_test_split(df, train_percent=.85, validate_percent=.05, seed=
 
 
 
-df = pd.read_csv("/local/datdb/SemEval2017Task4/4B-English/task4B_bert_sentiment_file.txt",sep="\t")
+df = pd.read_csv("/local/datdb/SemEval2017Task4/4B-English/task4B_bert_sentiment_file_notweet.txt",sep="\t")
 
 main_dir = main_dir + '/' + 'BertSentiment' 
 
@@ -35,7 +35,7 @@ if not os.path.exists(main_dir):
 
 
 for fold in [1]: 
-  where_fold = os.path.join( main_dir , "fold_"+str(fold))
+  where_fold = os.path.join( main_dir , "notweet_fold_"+str(fold))
   if not os.path.exists(where_fold): 
     os.mkdir(where_fold)
   os.chdir(where_fold)

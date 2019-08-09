@@ -16,7 +16,7 @@ main_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 out_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 
 
-bert_pretrain_file = open(out_dir+"task4B_bert_sentiment_file.txt","w", encoding="utf-8" )
+bert_pretrain_file = open(out_dir+"task4B_bert_sentiment_file_notweet.txt","w", encoding="utf-8" )
 bert_pretrain_file.write("index\tquestion\tsentence\tlabel\n")
 
 ## read tweet that has user info only ??
@@ -38,13 +38,13 @@ for index,row in tqdm ( df.iterrows() ) :
   user_text = " ".join( row[s] for s in ['description','name','location'] if row[s] is not np.NaN)
   user_text = user_text.strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
 
-  row_text = row['text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
+  # row_text = row['text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
 
   if len(user_text) > 0 : ## has something
-    text_sent = user_text + "\t" + row['topic'] + " " + row_text + "\t" + label
+    text_sent = user_text + "\t" + row['topic'] + "\t" + label # " " + row_text
 
   else:
-    text_sent = row['topic'] + "\t" + row_text + "\t" + label ## ignore user name
+    text_sent = row['topic'] + "\t" + label ## ignore user name # + row_text + "\t"
 
   bert_pretrain_file.write( str(counter) + "\t" + text_sent + "\n") ## blank between document
   counter = counter + 1
@@ -66,7 +66,7 @@ for index,row in tqdm ( df.iterrows() ) :
 
   row_text = row['tweet_text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
 
-  text_sent = row['topic'] + "\t" + row_text + "\t" + label ## ignore user name
+  text_sent = row['topic'] + "\t" + row_text + "\t" + label ## ignore user name row_text + "\t" 
 
   bert_pretrain_file.write( str(counter) + "\t" + text_sent + "\n") ## blank between document
   counter = counter + 1
