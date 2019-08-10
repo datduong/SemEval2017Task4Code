@@ -383,12 +383,13 @@ class WnliProcessor(DataProcessor):
 
 def make_token (string_input,tokenizer,tokens,segment_ids,segment_type,cls_token=None): 
   if string_input == '[MASK]': 
-    tokens = tokens + ['[MASK]'] ### mask token in bert-cased-base is position 103, so double check this. 
+    this_token = ['[MASK]'] ### mask token in bert-cased-base is position 103, so double check this. 
   else: 
-    tokens = tokenizer.tokenize(string_input)
-  ## always need segment ids 
-  tokens = tokens + ['[SEP]'] ## add sep at end to indicate ends. will add cls later
-  segment_ids = segment_ids + [segment_type] * len(tokens)
+    this_token = tokenizer.tokenize(string_input)
+
+  this_token = this_token + ['[SEP]'] ## add sep at end to indicate ends. will add cls later
+  tokens = tokens + this_token 
+  segment_ids = segment_ids + [segment_type] * len(this_token) ## always need segment ids 
   
   if cls_token is not None: 
     tokens = ['[CLS]'] + tokens
@@ -428,10 +429,6 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     tokens, segment_ids = make_token(example.tweet_topic,tokenizer,tokens,segment_ids,4)
     tokens, segment_ids = make_token(example.tweet_text,tokenizer,tokens,segment_ids,5)
 
-    ## add CLS
-    tokens = [cls_token] + tokens 
-    segment_ids = [0] + segment_ids ## add to the 1st sentence. 
-
 
     # The convention in BERT is:
     # (a) For sequence pairs:
@@ -458,6 +455,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     # tokens are attended to.
     input_mask = [1 if mask_padding_with_zero else 0] * len(input_ids)
 
+
     # Zero-pad up to the sequence length.
     padding_length = max_seq_length - len(input_ids)
     if pad_on_left:
@@ -473,6 +471,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     assert len(input_mask) == max_seq_length
     assert len(segment_ids) == max_seq_length
 
+    
     if output_mode == "classification":
       label_id = label_map[example.label]
     elif output_mode == "regression":
