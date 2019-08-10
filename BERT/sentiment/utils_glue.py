@@ -481,14 +481,14 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
       raise KeyError(output_mode)
 
     if ex_index < 5:
-      logger.info("*** Example ***")
-      logger.info("guid: %s" % (example.guid))
-      logger.info("tokens: %s" % " ".join(
+      print("*** Example ***")
+      print("guid: %s" % (example.guid))
+      print("tokens: %s" % " ".join(
           [str(x) for x in tokens]))
-      logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-      logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
-      logger.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-      logger.info("label: %s (id = %d)" % (example.label, label_id))
+      print("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+      print("input_mask: %s" % " ".join([str(x) for x in input_mask]))
+      print("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
+      print("label: %s (id = %d)" % (example.label, label_id))
 
     features.append(
         InputFeatures(input_ids=input_ids,
