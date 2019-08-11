@@ -11,7 +11,7 @@ server = '/u/scratch/d/datduong/'
 
 
 ## note: the ratio are computed to match the baseline ratio
-def train_validate_test_split(df, train_percent=.85, validate_percent=.05, seed=1234):
+def train_validate_test_split(df, train_percent=.80, validate_percent=.05, seed=1234):
   np.random.seed(seed)
   perm = np.random.permutation(df.index)
   m = len(df.index)
@@ -31,7 +31,7 @@ def submitJobs (main_dir, in_file, to_skip) :
   if to_skip == 'none':
     to_skip = ""
   else: 
-    to_skip = re.sub(r"\+","_",to_skip)
+    to_skip = "_" + re.sub(r"\+","_",to_skip)
 
   main_dir = server+'SemEval2017Task4/4B-English/'
   os.chdir(main_dir)
@@ -43,7 +43,7 @@ def submitJobs (main_dir, in_file, to_skip) :
 
 
   for fold in [1]: 
-    where_fold = os.path.join( main_dir , "full_data_mask_type_" + to_skip )
+    where_fold = os.path.join( main_dir , "full_data_mask" + to_skip )
     if not os.path.exists(where_fold): 
       os.mkdir(where_fold)
     os.chdir(where_fold)

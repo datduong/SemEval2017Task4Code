@@ -23,6 +23,9 @@ import logging
 import os
 import random
 
+from copy import deepcopy
+
+import scipy
 import numpy as np
 import torch
 
@@ -34,8 +37,7 @@ from torch.utils.data.distributed import DistributedSampler
 from tensorboardX import SummaryWriter
 from tqdm import tqdm, trange
 
-from pytorch_transformers import (WEIGHTS_NAME, BertConfig,
-                  BertForSequenceClassification, BertTokenizer,
+from pytorch_transformers import (WEIGHTS_NAME, BertConfig, BertTokenizer,
                   XLMConfig, XLMForSequenceClassification,
                   XLMTokenizer, XLNetConfig,
                   XLNetForSequenceClassification,
@@ -46,12 +48,14 @@ from pytorch_transformers import AdamW, WarmupLinearSchedule
 from utils_glue import (compute_metrics, convert_examples_to_features,
             output_modes, processors)
 
+import vector_extractor
+
 logger = logging.getLogger(__name__)
 
 ALL_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in (BertConfig, XLNetConfig, XLMConfig)), ())
 
 MODEL_CLASSES = {
-  'bert': (BertConfig, BertForSequenceClassification, BertTokenizer),
+  'bert': (BertConfig, vector_extractor.BertForSequenceClassificationWeighted, BertTokenizer),
   'xlnet': (XLNetConfig, XLNetForSequenceClassification, XLNetTokenizer),
   'xlm': (XLMConfig, XLMForSequenceClassification, XLMTokenizer),
 }
@@ -137,6 +141,7 @@ def train(args, train_dataset, model, tokenizer):
             'token_type_ids': batch[2] if args.model_type in ['bert', 'xlnet'] else None,  # XLM don't use segment_ids
             'labels':         batch[3]}
       outputs = model(**inputs)
+      # outputs  # (loss), scores, (hidden_states), (attentions)
       loss = outputs[0]  # model outputs are always tuple in pytorch-transformers (see doc)
 
       if args.n_gpu > 1:
@@ -230,6 +235,7 @@ def evaluate(args, model, tokenizer, prefix=""):
     eval_loss = 0.0
     nb_eval_steps = 0
     preds = None
+    raw_prob = None
     out_label_ids = None
     for batch in tqdm(eval_dataloader, desc="Evaluating"):
       model.eval()
@@ -254,6 +260,7 @@ def evaluate(args, model, tokenizer, prefix=""):
 
     eval_loss = eval_loss / nb_eval_steps
     if args.output_mode == "classification":
+      raw_prob = scipy.special.softmax(preds, axis=1)
       preds = np.argmax(preds, axis=1)
     elif args.output_mode == "regression":
       preds = np.squeeze(preds)
@@ -267,6 +274,8 @@ def evaluate(args, model, tokenizer, prefix=""):
         logger.info("  %s = %s", key, str(result[key]))
         writer.write("%s = %s\n" % (key, str(result[key])))
 
+  results ['preds'] = preds
+  results ['raw_prob'] = raw_prob
   return results
 
 

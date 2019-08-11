@@ -19,7 +19,7 @@ def submitJobs (main_dir, output_file, to_skip) :
     add_name = ""
     to_skip = []
   else:
-    add_name = re.sub(r"\+","_",to_skip)
+    add_name = "_"+re.sub(r"\+","_",to_skip)
     to_skip = to_skip.strip().split("+")
     print (to_skip)
     
@@ -27,7 +27,7 @@ def submitJobs (main_dir, output_file, to_skip) :
   # task4B_bert_sentiment_file_notweet
   # main_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 
-  bert_pretrain_file = open(main_dir+output_file+"_"+add_name+".txt","w", encoding="utf-8" )
+  bert_pretrain_file = open(main_dir+output_file+add_name+".txt","w", encoding="utf-8" )
   bert_pretrain_file.write("index\tuser_name\tuser_desc\tuser_loc\tuser_gender\ttweet_topic\ttweet_text\ttweet_id\tlabel\n")
 
   ## read tweet that has user info only ??
