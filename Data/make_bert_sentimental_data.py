@@ -19,8 +19,9 @@ def submitJobs (main_dir, output_file, to_skip) :
     add_name = ""
     to_skip = []
   else:
-    add_name = re.sub(" ","_",to_skip)
-    to_skip = to_skip.strip().split()
+    add_name = re.sub(r"\+","_",to_skip)
+    to_skip = to_skip.strip().split("+")
+    print (to_skip)
     
 
   # task4B_bert_sentiment_file_notweet

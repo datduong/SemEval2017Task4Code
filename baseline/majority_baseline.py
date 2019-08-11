@@ -6,14 +6,15 @@ import pandas as pd
 
 ## for each topic, count fraction positive/negative
 
-fin = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/notweet_fold_1/train.tsv",sep='\t',dtype=str)
+folder = 'full_data_mask_type'
+fin = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/"+folder+"/train.tsv",sep='\t',dtype=str)
 
 score = {} ## 'topoic' [negative positive]
 for row,line in fin.iterrows():
-  if line['topic'] not in score:
-    score[line['topic']] = [line['label']] ## collect negative/positive array
+  if line['tweet_topic'] not in score:
+    score[line['tweet_topic']] = [line['label']] ## collect negative/positive array
   else:
-    score[line['topic']].append(line['label']) ## append score
+    score[line['tweet_topic']].append(line['label']) ## append score
 
 #
 
@@ -27,7 +28,7 @@ for topic in score: ## now we actually count
 
 
 ## 
-pickle.dump(score,open("majority_score_by_topic.pickle","wb"))
+# pickle.dump(score,open("majority_score_by_topic.pickle","wb"))
 
 ## ****
 
@@ -48,19 +49,23 @@ def acc_and_f1(preds, labels):
 
 
 
-fin = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/notweet_fold_1/test.tsv",sep='\t',dtype=str)
+fin = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/"+folder+"/test_user_only.tsv",sep='\t',dtype=str)
 
 true_score = []
 predict_score = []
 for row,line in fin.iterrows():
-  predict_score.append ( np.argmax ( score [ line['topic'] ] ) ) ## just pick best score
+  predict_score.append ( np.argmax ( score [ line['tweet_topic'] ] ) ) ## just pick best score
   if line['label'] == 'entailment':
     true_score.append (1)
   else: 
     true_score.append (0)
 
 
-
 simple_accuracy(np.array(predict_score), np.array(true_score))
 
+fout = open('majority_baseline_by_topic.tsv','w')
+for key,val in score.items(): 
+  fout.write(key+"\t"+str(val[0])+"\t"+str(val[1])+"\n")
+
+fout.close() 
 

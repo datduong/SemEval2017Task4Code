@@ -295,10 +295,12 @@ class QnliProcessor(DataProcessor):
     return self._create_examples(
       self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
 
-  def get_dev_examples(self, data_dir):
+  def get_dev_examples(self, data_dir, name):
     """See base class."""
+    if name is None: 
+      name = 'dev.tsv'
     return self._create_examples(
-      self._read_tsv(os.path.join(data_dir, "dev.tsv")), 
+      self._read_tsv(os.path.join(data_dir, name)), 
       "dev_matched")
 
   def get_labels(self):

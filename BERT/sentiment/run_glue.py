@@ -95,6 +95,12 @@ def train(args, train_dataset, model, tokenizer):
       raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
     model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
+
+  print ('see params')
+  for n, p in model.named_parameters() :
+    print ('name {}'.format(n))
+    print ('requires grad {}'.format(p.requires_grad) )
+
   # multi-gpu training (should be after apex fp16 initialization)
   if args.n_gpu > 1:
     model = torch.nn.DataParallel(model)
@@ -123,6 +129,7 @@ def train(args, train_dataset, model, tokenizer):
   for _ in train_iterator:
     epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
     for step, batch in enumerate(epoch_iterator):
+
       model.train()
       batch = tuple(t.to(args.device) for t in batch)
       inputs = {'input_ids':      batch[0],
@@ -147,8 +154,22 @@ def train(args, train_dataset, model, tokenizer):
 
       tr_loss += loss.item()
       if (step + 1) % args.gradient_accumulation_steps == 0:
+
         scheduler.step()  # Update learning rate schedule
         optimizer.step()
+
+        if step % 100 == 0:  ## just want to see what's going on
+          print ('optim step happens, then ...')
+          print ('see model.bert.embeddings.token_type_embeddings.weight.value and grad step {}'.format(step))
+          print (model.bert.embeddings.token_type_embeddings.weight)
+          print (model.bert.embeddings.token_type_embeddings.weight.grad)
+          print ('see model.bert.embeddings.word_embeddings.weight.grad')
+          print (model.bert.embeddings.word_embeddings.weight.grad)
+          if model.bert.embeddings.token_type_embeddings.weight.grad is not None:
+            print ('sum of the 2 grads above')
+            print (torch.sum(model.bert.embeddings.token_type_embeddings.weight.grad))
+            print (torch.sum(model.bert.embeddings.word_embeddings.weight.grad))
+
         model.zero_grad()
         global_step += 1
 
@@ -264,7 +285,9 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
   else:
     logger.info("Creating features from dataset file at %s", args.data_dir)
     label_list = processor.get_labels()
-    examples = processor.get_dev_examples(args.data_dir) if evaluate else processor.get_train_examples(args.data_dir)
+    if args.test_file is not None: 
+      print ('test file is {}'.format(args.test_file))
+    examples = processor.get_dev_examples(args.data_dir, args.test_file) if evaluate else processor.get_train_examples(args.data_dir)
     features = convert_examples_to_features(examples, label_list, args.max_seq_length, tokenizer, output_mode,
       cls_token_at_end=bool(args.model_type in ['xlnet']),            # xlnet has a cls token at the end
       cls_token=tokenizer.cls_token,
@@ -272,9 +295,9 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
       cls_token_segment_id=2 if args.model_type in ['xlnet'] else 0,
       pad_on_left=bool(args.model_type in ['xlnet']),                 # pad on the left for xlnet
       pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0)
-    if args.local_rank in [-1, 0]:
-      logger.info("Saving features into cached file %s", cached_features_file)
-      torch.save(features, cached_features_file)
+    # if args.local_rank in [-1, 0] and (not args.do_eval):
+    #   logger.info("Saving features into cached file %s", cached_features_file)
+    #   torch.save(features, cached_features_file)
 
   # Convert to Tensors and build dataset
   all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
@@ -307,13 +330,15 @@ def main():
             help="How many segment types ? 2 for standard QNLI. 6 if we use tweeter style.")
 
   ## Other parameters
+  parser.add_argument("--test_file", default=None, type=str,
+            help="May need to pass in some file to test that is not dev.tsv")
   parser.add_argument("--config_name", default="", type=str,
             help="Pretrained config name or path if not the same as model_name")
   parser.add_argument("--tokenizer_name", default="", type=str,
             help="Pretrained tokenizer name or path if not the same as model_name")
   parser.add_argument("--cache_dir", default="", type=str,
             help="Where do you want to store the pre-trained models downloaded from s3")
-  parser.add_argument("--max_seq_length", default=128, type=int,
+  parser.add_argument("--max_seq_length", default=256, type=int,
             help="The maximum total input sequence length after tokenization. Sequences longer "
                "than this will be truncated, sequences shorter will be padded.")
   parser.add_argument("--do_train", action='store_true',
@@ -325,9 +350,9 @@ def main():
   parser.add_argument("--do_lower_case", action='store_true',
             help="Set this flag if you are using an uncased model.")
 
-  parser.add_argument("--per_gpu_train_batch_size", default=8, type=int,
+  parser.add_argument("--per_gpu_train_batch_size", default=10, type=int,
             help="Batch size per GPU/CPU for training.")
-  parser.add_argument("--per_gpu_eval_batch_size", default=8, type=int,
+  parser.add_argument("--per_gpu_eval_batch_size", default=12, type=int,
             help="Batch size per GPU/CPU for evaluation.")
   parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
             help="Number of updates steps to accumulate before performing a backward/update pass.")
@@ -346,9 +371,9 @@ def main():
   parser.add_argument("--warmup_steps", default=0, type=int,
             help="Linear warmup over warmup_steps.")
 
-  parser.add_argument('--logging_steps', type=int, default=50,
+  parser.add_argument('--logging_steps', type=int, default=500,
             help="Log every X updates steps.")
-  parser.add_argument('--save_steps', type=int, default=50,
+  parser.add_argument('--save_steps', type=int, default=500,
             help="Save checkpoint every X updates steps.")
   parser.add_argument("--eval_all_checkpoints", action='store_true',
             help="Evaluate all checkpoints starting with the same prefix as model_name ending and ending with step number")
@@ -427,11 +452,17 @@ def main():
 
   ## now ... we have to fix the nn.Emb for token-type
   # must change @config and @model
-  if args.num_segment_type>2: 
+  if (args.num_segment_type>2) and (not args.do_eval):
     print ('\n\nchange default config and model to take in more than 2 vocab type\n\n')
     config.type_vocab_size = args.num_segment_type
     ## must replace @BertEmbeddings.token_type_embeddings
     model.bert.embeddings.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size) ## change this layer to have more than 2 types like user_name user_desc etc...
+    ## must initalize the @token_type_embeddings correctly, not just random init 
+    print ('see init of token type before normalize')
+    print (model.bert.embeddings.token_type_embeddings.weight)
+    model.bert.embeddings.token_type_embeddings.weight.data.normal_(mean=0.0, std=config.initializer_range) ## in-place operation
+    print ('after')
+    print (model.bert.embeddings.token_type_embeddings.weight)
     print (model)
     print ('\n\n')
 
@@ -488,6 +519,8 @@ def main():
       result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
       results.update(result)
 
+  print ('results')
+  print (results)
   return results
 
 

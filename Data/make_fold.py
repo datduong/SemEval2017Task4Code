@@ -31,7 +31,7 @@ def submitJobs (main_dir, in_file, to_skip) :
   if to_skip == 'none':
     to_skip = ""
   else: 
-    to_skip = re.sub(" ","_",to_skip)
+    to_skip = re.sub(r"\+","_",to_skip)
 
   main_dir = server+'SemEval2017Task4/4B-English/'
   os.chdir(main_dir)
