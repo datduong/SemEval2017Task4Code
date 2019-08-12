@@ -20,7 +20,7 @@ for folder in ['full_data_mask_name_description_location_user_gender','full_data
 
 ## filter by topic, some topic has almost 100% positive. 
 
-for topic in ['islam','sharknado']: 
+for topic in ['islam','israel','sharknado']: 
   for folder in ['full_data_mask_name_description_location_user_gender','full_data_mask','full_data_mask_text','full_data_mask_name','full_data_mask_description','full_data_mask_location','full_data_mask_user_gender']: 
     test_df = pd.read_csv('BertSentiment/'+folder+"/test.tsv",sep="\t")
     print ('num row 1st read in {} '.format(test_df.shape))
@@ -29,4 +29,7 @@ for topic in ['islam','sharknado']:
     print ('num row keep only user {} '.format(test_df.shape))
     test_df.to_csv('BertSentiment/'+folder+"/test_user_only_"+topic+".tsv",sep="\t",index=None)
 
+
+
+## we will extract topics where fraction positive/negative are borderline. 
 

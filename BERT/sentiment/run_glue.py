@@ -296,7 +296,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
   else:
     logger.info("Creating features from dataset file at %s", args.data_dir)
     label_list = processor.get_labels()
-    if args.test_file is not None: 
+    if args.test_file is not None:
       print ('test file is {}'.format(args.test_file))
     examples = processor.get_dev_examples(args.data_dir, args.test_file) if evaluate else processor.get_train_examples(args.data_dir)
     features = convert_examples_to_features(examples, label_list, args.max_seq_length, tokenizer, output_mode,
@@ -458,7 +458,19 @@ def main():
   config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path, num_labels=num_labels, finetuning_task=args.task_name)
   tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else args.model_name_or_path, do_lower_case=args.do_lower_case)
 
+
   ## @config is passed into the @model, but it is not kept as an attribute at all, we only need to change @type_vocab_size
+
+  if (args.num_segment_type>2) and (args.do_eval):
+    ## **** when we load a saved model, it will give error, we have to fix the preset model token-type-number
+    ## for training, we will do this step later after loading the params. because for training, we want to load the model with 2 token-type for initialization
+    print ('\n\nfor evalution step, we init model with 2 toke-type, so before we load our model, we change default config and model to take in more than 2 vocab type\n\n')
+    config.type_vocab_size = args.num_segment_type
+    ## must replace @BertEmbeddings.token_type_embeddings
+    ## do not need to initialize, the weights will get replaced anyway
+    # model.bert.embeddings.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size) ## change this layer to have more than 2 types like user_name user_desc etc...
+
+
   model = model_class.from_pretrained(args.model_name_or_path, from_tf=bool('.ckpt' in args.model_name_or_path), config=config)
 
   ## now ... we have to fix the nn.Emb for token-type
@@ -468,14 +480,12 @@ def main():
     config.type_vocab_size = args.num_segment_type
     ## must replace @BertEmbeddings.token_type_embeddings
     model.bert.embeddings.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size) ## change this layer to have more than 2 types like user_name user_desc etc...
-    ## must initalize the @token_type_embeddings correctly, not just random init 
-    print ('see init of token type before normalize')
-    print (model.bert.embeddings.token_type_embeddings.weight)
+    ## must initalize the @token_type_embeddings correctly, not just random init
     model.bert.embeddings.token_type_embeddings.weight.data.normal_(mean=0.0, std=config.initializer_range) ## in-place operation
-    print ('after')
-    print (model.bert.embeddings.token_type_embeddings.weight)
-    print (model)
-    print ('\n\n')
+
+  print ('\n\nsee model\n\n')
+  print (model)
+  print ('\n\n')
 
   if args.local_rank == 0:
     torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
