@@ -76,6 +76,7 @@ df_tweet.columns = ['tweet_id','topic','score','text']
 
 topic_info = {} ## name/group/tweet
 topic_gender = []
+tweet_text = [] ## we want to format it without any \t\n
 for index,row in tqdm( df_tweet.iterrows() ): 
   if row['topic'] not in topic_info:
     topic_info[row['topic']] = 1
@@ -83,11 +84,16 @@ for index,row in tqdm( df_tweet.iterrows() ):
     topic_info[row['topic']] = topic_info[row['topic']] + 1 ## count user occurances 
   ## 
   topic_gender.append ( GetGender( row['topic'] ) ) 
+  tweet_text.append ( row['text'].replace("\n"," ").replace("\t"," ").replace("\r"," ") )
+  # if row['tweet_id'] == 636204035910053889:
+  #   break 
 
 
 df_tweet['topic_gender'] = topic_gender
-df_tweet.to_csv ( "SemEval2017-task4-dev.subtask-BD.english.INPUT.gender.tsv" , sep="\t", index=None) 
+df_tweet['text'] = tweet_text
+df_tweet.to_csv ( "SemEval2017-task4-dev.subtask-BD.english.INPUT.gender.tsv" , sep="\t" , index=None) # , index=None
 
+# 636204035910053889
 
 ## merge
 print ('tweet df count {}'.format(df_tweet.shape) )

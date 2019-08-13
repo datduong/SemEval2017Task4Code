@@ -22,7 +22,7 @@ def submitJobs (main_dir, output_file, to_skip) :
     add_name = "_"+re.sub(r"\+","_",to_skip)
     to_skip = to_skip.strip().split("+")
     print (to_skip)
-    
+
 
   # task4B_bert_sentiment_file_notweet
   # main_dir = '/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
@@ -85,9 +85,9 @@ def submitJobs (main_dir, output_file, to_skip) :
   # if 'text' in to_skip:
   #   bert_pretrain_file.close()
   #   print ('here, we ignore the text, so we do not write topic-->score alone ?? exit')
-  #   exit() 
-    
-  ## 
+  #   exit()
+
+  ##
 
   df = pd.read_csv(main_dir+'SemEval2017-task4-dev.subtask-BD.english.INPUT.tsv',header=None,sep="\t",dtype=str)
   df.columns = ['tweet_id', 'topic', 'sentiment_score', 'text']
@@ -105,7 +105,7 @@ def submitJobs (main_dir, output_file, to_skip) :
 
     if 'text' in to_skip:
       text_sent = "[MASK]\t[MASK]\t[MASK]\t[MASK]\t" + row['topic'] + "\t[MASK]\t" + row['tweet_id'] + "\t" + label # " " + row_text
-    else: 
+    else:
       row_text = row['text'].strip().replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').strip()
       text_sent = "[MASK]\t[MASK]\t[MASK]\t[MASK]\t" + row['topic'] + "\t" + row_text + "\t" + row['tweet_id'] + "\t" + label # " " + row_text
 

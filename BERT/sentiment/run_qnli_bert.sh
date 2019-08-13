@@ -16,8 +16,9 @@ module load python/3.7.2
 cd /u/scratch/d/datduong/SemEval2017Task4/SemEval2017Task4Code/Data
 main_dir='/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
 fout='task4B_bert_sentiment_file_mask'
+do_filter_test_label='1'
 python3 make_bert_sentimental_data.py $main_dir $fout none
-python3 make_fold.py $main_dir $fout'.txt' none
+python3 make_fold.py $main_dir $fout'.txt' none $do_filter_test_label
 
 for to_skip in text name description location user_gender ; do # text name description location user_gender
   python3 make_bert_sentimental_data.py $main_dir $fout $to_skip
@@ -36,6 +37,21 @@ python3 make_fold.py $main_dir $fout'_name_description_location_user_gender.txt'
 
 
 ## can we load a model with more than 2 id types ??? yes ... we can trick the model 
+
+
+# BertSentimentFilterTestLabel
+conda activate tensorflow_gpuenv
+data_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel/full_data_mask/'
+output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel/full_data_mask/'
+mkdir $output_dir
+model_name_or_path='/local/datdb/SemEval2017Task4/4B-English/BertFineTune/' ## load fine tune with just 2 tokens 
+config_name=$model_name_or_path/'bert_config.json'
+tokenizer_name='bert-base-cased'
+
+cd /local/datdb/SemEval2017Task4/SemEval2017Task4Code/BERT/sentiment
+CUDA_VISIBLE_DEVICES=1 python3 -u run_glue.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_train --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 --logging_steps 250 --save_steps 250 > $output_dir/track.log
+
+
 
 
 ## run entailment based on BERT. using QNLI as template input, use MASK if data is missing, so we have 6 token types

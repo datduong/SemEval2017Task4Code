@@ -27,7 +27,7 @@ def accuracy_by_topic (true_label_arr_train,true_label_arr_test): # @true_label 
 folder = 'full_data_mask'
 fin = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/"+folder+"/train.tsv",sep='\t',dtype=str)
 
-true_label_dict_train = {} ## 'topoic' [negative positive]
+true_label_dict_train = {} ## 'topic' [negative positive]
 for row,line in fin.iterrows():
   if line['tweet_topic'] not in true_label_dict_train:
     true_label_dict_train[line['tweet_topic']] = [line['label']] ## collect negative/positive array
