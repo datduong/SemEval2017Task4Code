@@ -13,17 +13,17 @@ user_df = pd.read_csv("output_semeval_tweet_userinfo.gender.tsv",sep="\t") ## ha
 tweet_with_user = list ( user_df['tweet_id'] )
 
 
-topic_list = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/BertSentiment/full_data_mask/topic_to_test.tsv",sep="\t",header=None)
+topic_list = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/topic_to_test.txt",sep="\t",header=None)
 topic_list = list (topic_list[0])
 
 for topic in topic_list: 
   for folder in ['full_data_mask','full_data_mask_name_description_location_user_gender', 'full_data_mask_text','full_data_mask_description']: # 'full_data_mask_name_description_location_user_gender', 'full_data_mask_text','full_data_mask_description'
-    test_df = pd.read_csv('BertSentiment/'+folder+"/test.tsv",sep="\t")
+    test_df = pd.read_csv('BertSentimentFilterTestLabel/'+folder+"/test.tsv",sep="\t")
     print ('num row 1st read in {} '.format(test_df.shape))
     test_df = test_df [ test_df['tweet_id'].isin(tweet_with_user)]
     test_df = test_df [ test_df['tweet_topic'].isin([topic])] 
     print ('num row keep only user {} '.format(test_df.shape))
     if test_df.shape[0]==0: 
       continue
-    test_df.to_csv('BertSentiment/'+folder+"/test_user_only_"+re.sub (" ","_",topic)+".tsv",sep="\t",index=None)
+    test_df.to_csv('BertSentimentFilterTestLabel/'+folder+"/test_user_only_"+re.sub (" ","_",topic)+".tsv",sep="\t",index=None)
 
