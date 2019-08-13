@@ -35,7 +35,7 @@ output_dir_log=$output_dir/'by_topic'
 mkdir $output_dir_log
 
 for folder in full_data_mask full_data_mask_name_description_location_user_gender full_data_mask_text full_data_mask_description ; do 
-  for test_data_type in FILEHERE ; do
+  for test_data_type in test_user_only FILEHERE ; do
     test_file=$fold_where_test_file'/'$folder'/'$test_data_type'.tsv'
     CUDA_VISIBLE_DEVICES=1 python3 -u run_glue.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_eval --test_file $test_file --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 > $output_dir_log/test_$folder'_'$test_data_type.log
   done
