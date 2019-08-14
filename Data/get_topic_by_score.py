@@ -36,12 +36,12 @@ for topic in true_label_dict: ## now we actually count
 topic_to_test = []
 topics = sorted( list ( true_label_dict_score.keys() ) )
 for topic in topics:
-  if (true_label_dict_score[topic][1] < 0.9) and (true_label_dict_score[topic][1] > 0.1) : ## [1] is fraction of positive
+  if (true_label_dict_score[topic][1] < 0.7) and (true_label_dict_score[topic][1] > 0.3) : ## [1] is fraction of positive
     topic_to_test.append(topic)
 
 
 ##
-fout = open("/u/scratch/d/datduong/SemEval2017Task4/4B-English/topic_to_test.txt","w")
+fout = open("/u/scratch/d/datduong/SemEval2017Task4/4B-English/topic_to_test_3_7.txt","w")
 fout.write("\n".join(topic_to_test))
 fout.close() 
 

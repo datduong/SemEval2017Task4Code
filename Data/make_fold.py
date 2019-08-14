@@ -40,11 +40,11 @@ def train_validate_test_split(df, train_percent=.80, validate_percent=.05, seed=
 
 
 
-def submitJobs (main_dir, in_file, to_skip, filter_topic) :
+def submitJobs (main_dir, in_file, to_skip, filter_topic, topic_to_test_file, where_save) :
 
   if filter_topic == 1:
     print ('\n\nread topic and keep only topic with equal vote in test set\n\n')
-    topic_list = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/topic_to_test.txt",header=None)
+    topic_list = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/"+topic_to_test_file+".txt",header=None)
     topic_list = sorted (list (topic_list[0]))
   else:
     topic_list = None
@@ -59,7 +59,7 @@ def submitJobs (main_dir, in_file, to_skip, filter_topic) :
   os.chdir(main_dir)
 
   df = pd.read_csv(main_dir+in_file,sep="\t") ## task4B_bert_sentiment_file_full.txt
-  main_dir = main_dir + '/' + 'BertSentimentFilterTestLabel'
+  main_dir = main_dir + '/' + where_save
   if not os.path.exists(main_dir):
     os.mkdir(main_dir)
 
@@ -86,5 +86,5 @@ if len(sys.argv)<1: ## run script
   print("Usage: \n")
   sys.exit(1)
 else:
-  submitJobs ( sys.argv[1] , sys.argv[2] , sys.argv[3], int(sys.argv[4]) )
+  submitJobs ( sys.argv[1] , sys.argv[2] , sys.argv[3], int(sys.argv[4]), sys.argv[5], sys.argv[6] )
 
