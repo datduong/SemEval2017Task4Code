@@ -21,5 +21,5 @@ gamergate = gamergate[names]
 gamergate = gamergate.sample(n=1000)
 
 df = pd.concat([df,gamergate])
-df.to_csv("task4B_bert_sentiment_add_gamergate.txt",sep="\t")
+df.to_csv("task4B_bert_sentiment_add_gamergate.txt",sep="\t",index=None)
 

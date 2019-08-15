@@ -278,6 +278,11 @@ def evaluate(args, model, tokenizer, prefix=""):
 
   results ['preds'] = preds
   results ['raw_prob'] = raw_prob
+  if args.write_prob is not None: 
+    fout = open(args.write_prob,'w')
+    fout.write ("\n".join(str(s) for s in preds))
+    fout.close() 
+
   return results
 
 
@@ -341,6 +346,8 @@ def main():
             help="How many segment types ? 2 for standard QNLI. 6 if we use tweeter style.")
 
   ## Other parameters
+  parser.add_argument("--write_prob", default=None, type=str,
+            help="Write prediction probability")
   parser.add_argument("--test_file", default=None, type=str,
             help="May need to pass in some file to test that is not dev.tsv")
   parser.add_argument("--config_name", default="", type=str,

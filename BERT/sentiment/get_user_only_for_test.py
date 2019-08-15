@@ -11,7 +11,7 @@ user_df = pd.read_csv("output_semeval_tweet_userinfo.gender.tsv",sep="\t") ## ha
 tweet_with_user = list ( user_df['tweet_id'] )
 
 # 'full_data_mask_name_description_location_user_gender','full_data_mask','full_data_mask_text','full_data_mask_description' 'full_data_mask_description_location_user_gender','full_data_mask_name_description_location_user_gender','full_data_mask_user_gender','full_data_mask_text','full_data_mask_name','full_data_mask_location','full_data_mask_description','full_data_mask_description_name','full_data_mask_description_user_gender','full_data_mask_description_location'
-for folder in ['full_data_mask_name_description_user_gender','full_data_mask_name_description_location']: 
+for folder in ['full_data_mask_location_user_gender','add_gamergate']: 
   test_df = pd.read_csv('BertSentimentFilterTestLabel37/'+folder+"/test.tsv",sep="\t")
   print ('num row 1st read in {} '.format(test_df.shape))
   test_df = test_df [ test_df['tweet_id'].isin(tweet_with_user)]

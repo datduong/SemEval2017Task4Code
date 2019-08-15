@@ -106,7 +106,7 @@ done
 # BertSentimentFilterTestLabel
 conda activate tensorflow_gpuenv
 
-for folder_type in full_data_mask_location_user_gender ; do 
+for folder_type in add_gamergate ; do 
 
   data_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel37/'$folder_type # full_data_mask
   output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel37/'$folder_type
@@ -116,7 +116,7 @@ for folder_type in full_data_mask_location_user_gender ; do
   tokenizer_name='bert-base-cased'
 
   cd /local/datdb/SemEval2017Task4/SemEval2017Task4Code/BERT/sentiment
-  CUDA_VISIBLE_DEVICES=1 python3 -u run_glue.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_train --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 --logging_steps 1000 --save_steps 1000 > $output_dir/track.log
+  CUDA_VISIBLE_DEVICES=3 python3 -u run_glue.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_train --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 --logging_steps 1000 --save_steps 1000 > $output_dir/track.log
 
 done 
 
