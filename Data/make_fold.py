@@ -40,7 +40,7 @@ def train_validate_test_split(df, train_percent=.80, validate_percent=.05, seed=
 
 
 
-def submitJobs (main_dir, in_file, to_skip, filter_topic, topic_to_test_file, where_save) :
+def submitJobs (main_dir, in_file, to_skip, filter_topic, topic_to_test_file, where_save, base_name) :
 
   if filter_topic == 1:
     print ('\n\nread topic and keep only topic with equal vote in test set\n\n')
@@ -65,7 +65,7 @@ def submitJobs (main_dir, in_file, to_skip, filter_topic, topic_to_test_file, wh
 
 
   for fold in [1]:
-    where_fold = os.path.join( main_dir , "full_data_mask" + to_skip )
+    where_fold = os.path.join( main_dir , base_name + to_skip )
     if not os.path.exists(where_fold):
       os.mkdir(where_fold)
     os.chdir(where_fold)
@@ -86,5 +86,5 @@ if len(sys.argv)<1: ## run script
   print("Usage: \n")
   sys.exit(1)
 else:
-  submitJobs ( sys.argv[1] , sys.argv[2] , sys.argv[3], int(sys.argv[4]), sys.argv[5], sys.argv[6] )
+  submitJobs ( sys.argv[1] , sys.argv[2] , sys.argv[3], int(sys.argv[4]), sys.argv[5], sys.argv[6], sys.argv[7] )
 

@@ -383,11 +383,15 @@ class WnliProcessor(DataProcessor):
     return examples
 
 
-def make_token (string_input,tokenizer,tokens,segment_ids,segment_type,cls_token=None): 
+def make_token (string_input,tokenizer,tokens,segment_ids,segment_type,cls_token=None,truncate=False): 
   if string_input == '[MASK]': 
     this_token = ['[MASK]'] ### mask token in bert-cased-base is position 103, so double check this. 
   else: 
     this_token = tokenizer.tokenize(string_input)
+
+  if truncate: 
+    if len(this_token) > 200: ## save space for self description
+      this_token = this_token[0:200]
 
   this_token = this_token + ['[SEP]'] ## add sep at end to indicate ends. will add cls later
   tokens = tokens + this_token 
@@ -424,7 +428,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     tokens = [] ## start empty 
     segment_ids = []
 
-    tokens, segment_ids = make_token(example.user_name,tokenizer,tokens,segment_ids,0,cls_token=cls_token) ## only add CLS to first input
+    tokens, segment_ids = make_token(example.user_name,tokenizer,tokens,segment_ids,0,cls_token=cls_token,truncate=True) ## only add CLS to first input
     tokens, segment_ids = make_token(example.user_desc,tokenizer,tokens,segment_ids,1)
     tokens, segment_ids = make_token(example.user_loc,tokenizer,tokens,segment_ids,2)
     tokens, segment_ids = make_token(example.user_gender,tokenizer,tokens,segment_ids,3)
@@ -469,6 +473,8 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
       input_mask = input_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
       segment_ids = segment_ids + ([pad_token_segment_id] * padding_length)
 
+    # print (input_ids)
+    # print (len(input_ids))
     assert len(input_ids) == max_seq_length
     assert len(input_mask) == max_seq_length
     assert len(segment_ids) == max_seq_length

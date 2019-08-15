@@ -17,7 +17,7 @@ topic_list = ["test_user_only_"+re.sub(" ","_",top) for top in topic_list]
 script = """
 conda activate tensorflow_gpuenv
 ## *** do testing 
-for folder in full_data_mask ; do 
+for folder in full_data_mask_text ; do 
 
   data_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel37/'$folder
   output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentFilterTestLabel37/'$folder
@@ -35,7 +35,7 @@ for folder in full_data_mask ; do
 
   # full_data_mask full_data_mask_name_description_location_user_gender full_data_mask_text full_data_mask_description
 
-  for folder_of_test_file in full_data_mask full_data_mask_description full_data_mask_name_description_location_user_gender ; do 
+  for folder_of_test_file in full_data_mask_text ; do 
     output_dir_log_folder=$output_dir/'by_topic'/$folder_of_test_file
     mkdir $output_dir_log_folder
     for test_data_type in FILEHERE ; do 
