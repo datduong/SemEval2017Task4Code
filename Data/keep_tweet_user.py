@@ -20,8 +20,8 @@ df = pd.read_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/task4B_bert_
 
 ## must select only data with user name + description at the least ??
 df = df.loc[ ~((df['user_name']=='[MASK]') & (df['user_desc']=='[MASK]') & (df['user_loc']=='[MASK]')) ]
-df['tweet_text']='[MASK]' ## new topic so no writing
-df.to_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/task4B_bert_sentiment_nonan_user_mask_text.txt",sep='\t',index=None)
+# df['tweet_text']='[MASK]' ## new topic so no writing
+df.to_csv("/u/scratch/d/datduong/SemEval2017Task4/4B-English/task4B_bert_sentiment_nonan_user.txt",sep='\t',index=None)
 
 
 

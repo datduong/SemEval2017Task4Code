@@ -12,11 +12,24 @@ import os,re,sys,pickle
 import pandas as pd 
 
 os.chdir("/u/scratch/d/datduong/SemEval2017Task4/4B-English/")
-df = pd.read_csv("task4B_bert_sentiment_file_mask.txt",sep='\t')
+# df = pd.read_csv("task4B_bert_sentiment_nonan_user.txt",sep='\t')
 
-df['user_gender'] = '[MASK]'
-df['user_loc'] = '[MASK]'
+name = 'user_name user_desc user_loc  user_gender'.split()  # tweet_text
+name2 = 'name desc loc gender'.split() # text
+name_dict = {}
+for index,n in enumerate(name): 
+  name_dict[n] = name2[index]
 
-df.to_csv("task4B_bert_sentiment_file_mask_location_user_gender.txt",sep="\t",index=None)
+for key,val in name_dict.items(): ## @key is "user_name", @val is "name"
+  df = pd.read_csv("task4B_bert_sentiment_nonan_user.txt",sep='\t')
+  df['tweet_text'] = '[MASK]'
+  to_mask = [k for k in name if k!=key] ## mask everything example for @key
+  for m in to_mask:
+    df[m] = '[MASK]'
+  df.to_csv("task4B_bert_sentiment_nonan_user_keep_"+val+"_mask_text.txt",sep="\t",index=None)
 
 
+
+### mask all user 
+df = pd.read_csv("task4B_bert_sentiment_nonan_user.txt",sep='\t')
+df.to_csv("task4B_bert_sentiment_nonan_user_keep_"+val+".txt",sep="\t",index=None)

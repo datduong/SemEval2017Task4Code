@@ -60,14 +60,29 @@ python3 make_fold.py $main_dir $fout'_location_user_gender.txt' $to_skip $do_fil
 module load python/3.7.2
 cd /u/scratch/d/datduong/SemEval2017Task4/SemEval2017Task4Code/Data
 main_dir='/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
-fout='task4B_bert_sentiment_nonan_user_mask_text'
+fout='task4B_bert_sentiment_nonan_user'
 do_filter_test_label='1'
 to_skip='none'
 topic_to_test_file='topic_to_test_3_7'
 where_save='BertSentimentNoNanUser'
-base_name='MaskText'
+base_name='Base'
 # python3 make_bert_sentimental_data.py $main_dir $fout $to_skip
 python3 make_fold.py $main_dir $fout'.txt' $to_skip $do_filter_test_label $topic_to_test_file $where_save $base_name
+
+
+## keep**** something + tweet task4B_bert_sentiment_add_gamergate ...
+module load python/3.7.2
+cd /u/scratch/d/datduong/SemEval2017Task4/SemEval2017Task4Code/Data
+main_dir='/u/scratch/d/datduong/SemEval2017Task4/4B-English/'
+fout='task4B_bert_sentiment_nonan_user'
+do_filter_test_label='1'
+to_skip='none'
+topic_to_test_file='topic_to_test_3_7'
+where_save='BertSentimentNoNanUser'
+
+for base_name in name desc loc gender text ; do 
+  python3 make_fold.py $main_dir $fout'_mask_'$base_name'.txt' $to_skip $do_filter_test_label $topic_to_test_file $where_save $base_name
+done 
 
 
 
@@ -106,7 +121,7 @@ done
 # BertSentimentFilterTestLabel
 conda activate tensorflow_gpuenv
 
-for folder_type in MaskText ; do 
+for folder_type in Base ; do 
 
   data_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentNoNanUser/'$folder_type # full_data_mask
   output_dir='/local/datdb/SemEval2017Task4/4B-English/BertSentimentNoNanUser/'$folder_type
