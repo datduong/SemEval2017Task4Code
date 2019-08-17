@@ -18,16 +18,16 @@ setwd('C:/Users/dat/Documents/SemEval2017Task4/4B-English/PredictTopic')
 # red sox','rolling stones','miss usa','twilight
 label = c('iran', 'gay', 'islam', 'muslims', 'christians', 'red sox', 'rolling stones', 'miss usa', 'twilight')
 
-f1 = as.matrix ( read.csv("muslims_pos_cor.txt",header=F,stringsAsFactors=F,sep=" ") )
-f2 = as.matrix ( read.csv("muslims_neg_cor.txt",header=F,stringsAsFactors=F,sep=" ") )
+f1 = as.matrix ( read.csv("christians_pos_cor.txt",header=F,stringsAsFactors=F,sep=" ") )
+f2 = as.matrix ( read.csv("christians_neg_cor.txt",header=F,stringsAsFactors=F,sep=" ") )
 
-f1 = f1[-4,]
-f1 = f1[,-4]
+# f1 = f1[-4,]
+# f1 = f1[,-4]
 
-f2 = f2[-4,]
-f2 = f2[,-4]
+# f2 = f2[-4,]
+# f2 = f2[,-4]
 
-label = label[-4]
+# label = label[-4]
 
 make_plot = function(f1){
   colnames(f1) = label
@@ -50,6 +50,6 @@ plotf1 = make_plot(f1)
 plotf2 = make_plot(f2)
 
 ggarrange(plotf1, plotf2, 
-          labels = c("Positive on Muslims", "Negative on Muslims"), vjust=1.1,
+          labels = c("Positive on Christians", "Negative on Christians"), vjust=1.1,
           ncol = 2, nrow = 1)
 
