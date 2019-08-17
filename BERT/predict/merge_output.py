@@ -38,21 +38,26 @@ main_df = pd.concat([main_df,df],axis=1)
 # prob = df.to_numpy()
 # spearman_cor = scipy.stats.spearmanr(prob)
 
-is_female = [ bool(re.match('female',g)) for g in main_df['user_gender'] ]
-is_male = [ bool(re.match('(^male| male )',g)) for g in main_df['user_gender'] ]
+# is_female = [ bool(re.match('female',g)) for g in main_df['user_gender'] ]
+# is_male = [ bool(re.match('(^male| male )',g)) for g in main_df['user_gender'] ]
 
-female = main_df[is_female]
-male = main_df[is_male]
+# female = main_df[is_female]
+# male = main_df[is_male]
 
-female_cor = get_spearman_cor(female,topic_list)
-male_cor = get_spearman_cor(male,topic_list)
-np.savetxt('female_cor.txt', female_cor) 
-np.savetxt('male_cor.txt', male_cor) 
+# female_cor = get_spearman_cor(female,topic_list)
+# male_cor = get_spearman_cor(male,topic_list)
+# np.savetxt('female_cor.txt', female_cor) 
+# np.savetxt('male_cor.txt', male_cor) 
 
 
 def split_by_sentiment (main_df,topic,topic_list): 
   positive = main_df[ main_df['tweet_topic'].isin([topic]) & (main_df['label']=='entailment') ]
+  ## we know what the true label is if we split by group 
+  # positive[topic]
+  # we can't have all 0's or all 1's because we will get NaN in rank-correlation
+  # positive[topic] = 1.0 ## high prob is "positive"
   negative = main_df[ main_df['tweet_topic'].isin([topic]) & (main_df['label']=='not_entailment') ]
+  # negative[topic] = 0.0
   print ('dim pos df {}'.format(positive.shape))
   print ('dim neg df {}'.format(negative.shape))
   positive = get_spearman_cor(positive,topic_list)
