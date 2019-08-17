@@ -32,4 +32,27 @@ for key,val in name_dict.items(): ## @key is "user_name", @val is "name"
 
 ### mask all user 
 df = pd.read_csv("task4B_bert_sentiment_nonan_user.txt",sep='\t')
-df.to_csv("task4B_bert_sentiment_nonan_user_keep_"+val+".txt",sep="\t",index=None)
+name = 'user_name user_desc user_loc  user_gender'.split()
+for n in name: 
+  df[n] = '[MASK]'
+
+
+df.to_csv("task4B_bert_sentiment_nonan_user_mask_user_data.txt",sep="\t",index=None)
+
+
+
+### COUNT HOW MANY MASK
+import os,re,sys,pickle
+import pandas as pd 
+os.chdir("/u/scratch/d/datduong/SemEval2017Task4/4B-English/")
+name = 'user_name user_desc user_loc  user_gender'.split()  # tweet_text
+name2 = 'name desc loc gender'.split() # text
+name_dict = {}
+for index,n in enumerate(name): 
+  name_dict[n] = name2[index]
+
+df = pd.read_csv("task4B_bert_sentiment_nonan_user.txt",sep='\t')
+for key,val in name_dict.items(): ## @key is "user_name", @val is "name"
+  # df = pd.read_csv("task4B_bert_sentiment_nonan_user_keep_"+val+"_mask_text.txt",sep='\t')
+  print ('{} count {}'.format(key, list (df[key]).count('[MASK]')))
+

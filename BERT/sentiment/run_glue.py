@@ -262,6 +262,7 @@ def evaluate(args, model, tokenizer, prefix=""):
 
     eval_loss = eval_loss / nb_eval_steps
     if args.output_mode == "classification":
+      # raw_prob = deepcopy(preds) 
       raw_prob = scipy.special.softmax(preds, axis=1)
       preds = np.argmax(preds, axis=1)
     elif args.output_mode == "regression":
@@ -280,7 +281,7 @@ def evaluate(args, model, tokenizer, prefix=""):
   results ['raw_prob'] = raw_prob
   if args.write_prob is not None: 
     fout = open(args.write_prob,'w')
-    fout.write ("\n".join(str(s) for s in preds))
+    fout.write ("\n".join( [ str(raw_prob[s,0]) for s in range(raw_prob.shape[0]) ] )  ) ## position 0 is "positive" vote
     fout.close() 
 
   return results
