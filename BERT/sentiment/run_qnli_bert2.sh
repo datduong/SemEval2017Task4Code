@@ -61,6 +61,32 @@ for folder in keep_desc ; do
 done
 
 
+### TEST ON GAMER GATE
+
+conda activate tensorflow_gpuenv 
+for folder in Base ; do 
+
+  fold_where_test_file='/local/datdb/SemEval2017Task4/4B-English/BertSentimentNoNanUser'
+  data_dir=$fold_where_test_file/$folder
+  output_dir=$fold_where_test_file/$folder
+  mkdir $output_dir
+  model_name_or_path='/local/datdb/SemEval2017Task4/4B-English/BertFineTune/' ## load fine tune with just 2 tokens 
+  config_name=$model_name_or_path/'bert_config.json' ## doesnt matter, once we load the model, this will be override
+  tokenizer_name='bert-base-cased'
+
+  model_name_or_path=$output_dir ## so that we load in newer model, this will override the init finetune
+  
+  cd /local/datdb/SemEval2017Task4/SemEval2017Task4Code/BERT/sentiment
+
+  for test_data_type in 'test' ; do
+    test_file='/local/datdb/GamergateTweet/SplitData/NotMask/test.tsv' # $fold_where_test_file'/'$folder'/'$test_data_type'.tsv'
+    CUDA_VISIBLE_DEVICES=1 python3 -u run_glue.py --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_eval --test_file $test_file --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 > $output_dir/$folder'_gamergate_'$test_data_type.log
+  done
+
+done
+
+
+
 ### TEST ON SET OF TOPICS. WE HAVE TO MASK OUT TEXT IN THIS CASE
 conda activate tensorflow_gpuenv 
 where_test_file='/local/datdb/SemEval2017Task4/4B-English/PredictTopicNoNanUser'

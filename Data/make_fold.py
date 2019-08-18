@@ -55,7 +55,7 @@ def submitJobs (main_dir, in_file, to_skip, filter_topic, topic_to_test_file, wh
   else:
     to_skip = "_" + re.sub(r"\+","_",to_skip)
 
-  main_dir = server+'SemEval2017Task4/4B-English/'
+  # main_dir = server+'SemEval2017Task4/4B-English/'
   os.chdir(main_dir)
 
   df = pd.read_csv(main_dir+in_file,sep="\t") ## task4B_bert_sentiment_file_full.txt

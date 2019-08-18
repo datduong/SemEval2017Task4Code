@@ -39,7 +39,7 @@ done
 keep_gender keep_name keep_loc keep_desc keep_name_mask_text keep_desc_mask_text keep_loc_mask_text mask_user_data keep_gender_mask_text
 
 conda activate tensorflow_gpuenv 
-for folder in mask_text ; do 
+for folder in Base ; do 
 
   fold_where_test_file='/local/datdb/SemEval2017Task4/4B-English/BertSentimentNoNanUserZeroshot'
   data_dir=$fold_where_test_file/$folder
