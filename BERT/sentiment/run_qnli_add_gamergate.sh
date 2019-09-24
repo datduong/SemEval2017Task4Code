@@ -27,7 +27,7 @@ for folder_type in Base ; do
   tokenizer_name='bert-base-cased'
   train_file='train_add_gamergate.txt'
   cd /local/datdb/SemEval2017Task4/SemEval2017Task4Code/BERT/sentiment
-  CUDA_VISIBLE_DEVICES=6 python3 -u run_glue.py --train_file $train_file --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_train --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.0001 --fp16 --logging_steps 2000 --save_steps 2000 > $output_dir/track.log
+  CUDA_VISIBLE_DEVICES=6 python3 -u run_glue.py --train_file $train_file --data_dir $data_dir --model_type bert --model_name_or_path $model_name_or_path --task_name qnli --output_dir $output_dir --config_name $config_name --tokenizer_name $tokenizer_name --num_train_epochs 20 --do_train --max_seq_length 512 --overwrite_output_dir --evaluate_during_training --num_segment_type 6 --learning_rate 0.00001 --fp16 --logging_steps 1000 --save_steps 1000 > $output_dir/track.log
 
 done 
 
