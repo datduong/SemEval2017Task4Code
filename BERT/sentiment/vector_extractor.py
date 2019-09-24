@@ -93,7 +93,7 @@ class BertForSequenceClassificationWeighted(BertPreTrainedModel):
         loss_fct = MSELoss()
         loss = loss_fct(logits.view(-1), labels.view(-1))
       else:
-        loss_fct = CrossEntropyLoss(weight=torch.FloatTensor([0.64,2.25]).cuda()) 
+        loss_fct = CrossEntropyLoss()  ## weight=torch.FloatTensor([0.64,2.25]).cuda()
         loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
       outputs = (loss,) + outputs
 

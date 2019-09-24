@@ -304,7 +304,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
     label_list = processor.get_labels()
     if args.test_file is not None:
       print ('test file is {}'.format(args.test_file))
-    examples = processor.get_dev_examples(args.data_dir, args.test_file) if evaluate else processor.get_train_examples(args.data_dir)
+    examples = processor.get_dev_examples(args.data_dir, args.test_file) if evaluate else processor.get_train_examples(args.data_dir,args.train_file)
     features = convert_examples_to_features(examples, label_list, args.max_seq_length, tokenizer, output_mode,
       cls_token_at_end=bool(args.model_type in ['xlnet']),            # xlnet has a cls token at the end
       cls_token=tokenizer.cls_token,
@@ -346,7 +346,9 @@ def main():
   parser.add_argument("--num_segment_type", default=2, type=int, required=True,
             help="How many segment types ? 2 for standard QNLI. 6 if we use tweeter style.")
 
-  ## Other parameters
+  ## Other parameters add_on_name
+  parser.add_argument("--train_file", default=None, type=str,
+            help="Train file name")
   parser.add_argument("--write_prob", default=None, type=str,
             help="Write prediction probability")
   parser.add_argument("--test_file", default=None, type=str,
