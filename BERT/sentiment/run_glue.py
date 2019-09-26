@@ -542,16 +542,17 @@ def main():
       checkpoints = list(os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + '/**/' + WEIGHTS_NAME, recursive=True)))
       logging.getLogger("pytorch_transformers.modeling_utils").setLevel(logging.WARN)  # Reduce logging
     logger.info("Evaluate the following checkpoints: %s", checkpoints)
+    print("\n\nEvaluate the following checkpoints: %\n", checkpoints)
     for checkpoint in checkpoints:
       global_step = checkpoint.split('-')[-1] if len(checkpoints) > 1 else ""
       model = model_class.from_pretrained(checkpoint)
       model.to(args.device)
       result = evaluate(args, model, tokenizer, prefix=global_step)
+      print ('\ncheck point {}'.format(checkpoint))
+      print ("acc {}".format(result["acc"]))
       result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
       results.update(result)
 
-  print ('results')
-  print (results)
   return results
 
 
