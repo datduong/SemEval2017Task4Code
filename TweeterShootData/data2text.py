@@ -72,6 +72,9 @@ for add_on in list_name :
     this_user = json.loads(line)
     # break
 
+    if this_user['retweeted'] : 
+      continue ## don't need to count retweets ?? 
+
     # this_user['user']['screen_name']
     # this_user['user']['description']
     # this_user['user']['name']
